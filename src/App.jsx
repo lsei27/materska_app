@@ -5,6 +5,14 @@ const START_DATE = "2026-01-13";
 const END_DATE = "2026-03-10";
 const STORAGE_KEY = "maternity_countdown_v1";
 
+// Helper: Format Date to YYYY-MM-DD using local time parts
+const formatToISO = (date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+};
+
 // Helper: Parse ISO date string to local Midnight Date object
 const parseLocalDate = (isoStr) => {
     const [y, m, d] = isoStr.split('-').map(Number);
@@ -91,7 +99,7 @@ function App() {
         const end = parseLocalDate(END_DATE);
 
         while (current <= end) {
-            const id = current.toISOString().split('T')[0];
+            const id = formatToISO(current);
             days.push({
                 id,
                 label: current.toLocaleDateString('cs-CZ', { weekday: 'short', day: 'numeric', month: 'numeric' }),
