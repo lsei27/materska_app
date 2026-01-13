@@ -116,6 +116,13 @@ function App() {
         return days;
     }, []);
     const allDayIds = useMemo(() => new Set(allDays.map(day => day.id)), [allDays]);
+    const isOfficeDay = (day) => {
+        if (day.id === "2026-01-13" || day.id === CELEBRATION_DATE) {
+            return false;
+        }
+        const weekday = day.date.getDay();
+        return weekday >= 2 && weekday <= 4;
+    };
 
     // Time Logic
     const getTodayISO = () => {
@@ -138,6 +145,15 @@ function App() {
     const doneCount = workDays.filter(day => completedDays[day.id]).length;
     const remainingCount = totalDaysCount - doneCount;
     const progressPercent = Math.round((doneCount / totalDaysCount) * 100);
+    const officeRemainingCount = allDays.filter(day => {
+        if (!isOfficeDay(day)) {
+            return false;
+        }
+        if (day.id > todayISO) {
+            return true;
+        }
+        return day.id === todayISO && !completedDays[todayISO];
+    }).length;
 
     // Handlers
     const toggleToday = () => {
@@ -240,6 +256,7 @@ function App() {
                             const checked = day.id !== CELEBRATION_DATE && !!completedDays[day.id];
                             const isToday = day.id === todayISO;
                             const isCelebration = day.id === CELEBRATION_DATE;
+                            const isOffice = isOfficeDay(day);
                             return (
                                 <div
                                     key={day.id}
@@ -247,6 +264,7 @@ function App() {
                                 >
                                     <span className="calendar-date">{day.date.getDate()}</span>
                                     {isCelebration && <span className="calendar-heart">❤️</span>}
+                                    {isOffice && <span className="calendar-emoji">🚗</span>}
                                 </div>
                             );
                         })}
@@ -293,6 +311,10 @@ function App() {
                 <div className="kpi-card">
                     <span className="kpi-value">{progressPercent}%</span>
                     <span className="kpi-label">Hotovo</span>
+                </div>
+                <div className="kpi-card">
+                    <span className="kpi-value">{officeRemainingCount}</span>
+                    <span className="kpi-label">Do kanceláře</span>
                 </div>
             </section>
 
@@ -341,6 +363,7 @@ function App() {
                         {allDays.map((day) => {
                             const isCelebration = day.id === CELEBRATION_DATE;
                             const checked = isCelebration || !!completedDays[day.id];
+                            const isOffice = isOfficeDay(day);
                             const isToday = day.id === todayISO;
                             const isLocked = !isToday;
 
@@ -350,7 +373,10 @@ function App() {
                                         {checked && "❤"}
                                     </div>
                                     <div className="day-info">
-                                        <div className="day-date">{day.label}</div>
+                                        <div className="day-date">
+                                            <span>{day.label}</span>
+                                            {isOffice && <span className="day-office">🚗</span>}
+                                        </div>
                                         {/* <div className="day-msg">{day.msg}</div> */} {/* hidden as per user request */}
                                     </div>
                                     {isToday && <span className="status-badge today">DNES</span>}

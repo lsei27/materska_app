@@ -115,7 +115,7 @@ body {
 /* KPI Grid */
 .kpi-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
@@ -343,6 +343,14 @@ body {
   font-size: 1.1rem;
 }
 
+.calendar-emoji {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
 /* List Section */
 .list-header {
   display: flex;
@@ -411,9 +419,17 @@ body {
 }
 
 .day-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 700;
   font-size: 0.95rem;
   color: #2D3436;
+}
+
+.day-office {
+  font-size: 0.95rem;
+  opacity: 0.75;
 }
 
 .day-msg {
