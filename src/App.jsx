@@ -204,7 +204,7 @@ function App() {
             {/* DAYS LIST */}
             <section>
                 <div className="list-header">
-                    <h3>Cesta k Tadeáškovi</h3>
+                    <h3>Poslední dny v práci</h3>
                     <button className="list-toggle" onClick={() => setShowList(!showList)}>
                         {showList ? "Skrýt" : "Zobrazit dny"}
                     </button>
