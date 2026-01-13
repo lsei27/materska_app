@@ -448,24 +448,30 @@ body {
 .backup-actions {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 12px;
 }
 
-.btn-backup {
-  background: #f7f7f7;
-  border: 1px solid #eee;
-  color: #555;
-  padding: 10px 16px;
-  border-radius: 999px;
-  font-size: 0.8rem;
+.backup-link {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  padding: 4px 0;
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
-.btn-backup-secondary {
-  background: #fff;
+.backup-link:hover {
+  color: #888;
+}
+
+.backup-separator {
+  color: #d0d0d0;
+  font-size: 0.75rem;
 }
 
 .visually-hidden {

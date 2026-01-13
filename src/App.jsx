@@ -339,7 +339,8 @@ function App() {
                 {showList && (
                     <div className="days-list" style={{ marginTop: '16px' }}>
                         {allDays.map((day) => {
-                            const checked = !!completedDays[day.id];
+                            const isCelebration = day.id === CELEBRATION_DATE;
+                            const checked = isCelebration || !!completedDays[day.id];
                             const isToday = day.id === todayISO;
                             const isLocked = !isToday;
 
@@ -364,8 +365,9 @@ function App() {
             {/* FOOTER */}
             <footer className="footer">
                 <div className="backup-actions">
-                    <button className="btn-backup" onClick={exportBackup}>Záloha</button>
-                    <button className="btn-backup btn-backup-secondary" onClick={requestImport}>Obnovit</button>
+                    <button className="backup-link" onClick={exportBackup}>Záloha</button>
+                    <span className="backup-separator">•</span>
+                    <button className="backup-link" onClick={requestImport}>Obnovit</button>
                     <input
                         ref={fileInputRef}
                         className="visually-hidden"
