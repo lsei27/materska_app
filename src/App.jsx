@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 // KONSTRUKČNÍ POŽADAVKY: 2026-01-13 do 2026-03-10
 const START_DATE = "2026-01-13";
 const END_DATE = "2026-03-10";
+const CELEBRATION_DATE = "2026-03-10";
 const STORAGE_KEY = "maternity_countdown_v1";
+const CELEBRATION_MESSAGE = "Hurá, už se jen těšíme na budulínka! 👶🏻❤️";
+const BACKUP_VERSION = 1;
 
 // Helper: Format Date to YYYY-MM-DD using local time parts
 const formatToISO = (date) => {
@@ -77,7 +80,7 @@ const FIXED_MESSAGES = {
     "2026-03-07": "Sobota. Pomalu ladíme hlavu.",
     "2026-03-08": "Neděle. Klid před změnou.",
     "2026-03-09": "Pondělí. Už jen nadechnout.",
-    "2026-03-10": "Dnes nás čeká nové ovoce",
+    "2026-03-10": CELEBRATION_MESSAGE,
 };
 
 function App() {
@@ -86,6 +89,7 @@ function App() {
         return saved ? JSON.parse(saved) : {};
     });
     const [showList, setShowList] = useState(false);
+    const fileInputRef = useRef(null);
 
     // Persistence
     useEffect(() => {
@@ -111,6 +115,7 @@ function App() {
         }
         return days;
     }, []);
+    const allDayIds = useMemo(() => new Set(allDays.map(day => day.id)), [allDays]);
 
     // Time Logic
     const getTodayISO = () => {
@@ -125,16 +130,19 @@ function App() {
     const todayIndex = allDays.findIndex(d => d.id === todayISO);
     const isOutOfRange = todayIndex === -1 && (todayISO < START_DATE || todayISO > END_DATE);
     const todayData = allDays[todayIndex];
+    const isCelebrationDay = todayISO === CELEBRATION_DATE;
 
     // KPI Calculations
-    const totalDaysCount = allDays.length;
-    const doneCount = Object.values(completedDays).filter(Boolean).length;
+    const workDays = allDays.filter(day => day.id !== CELEBRATION_DATE);
+    const totalDaysCount = workDays.length;
+    const doneCount = workDays.filter(day => completedDays[day.id]).length;
     const remainingCount = totalDaysCount - doneCount;
     const progressPercent = Math.round((doneCount / totalDaysCount) * 100);
 
     // Handlers
     const toggleToday = () => {
         if (!todayData) return;
+        if (isCelebrationDay) return;
         setCompletedDays(prev => ({
             ...prev,
             [todayISO]: !prev[todayISO]
@@ -146,6 +154,54 @@ function App() {
             setCompletedDays({});
             localStorage.removeItem(STORAGE_KEY);
         }
+    };
+
+    const exportBackup = () => {
+        const payload = {
+            version: BACKUP_VERSION,
+            savedAt: new Date().toISOString(),
+            completedDays,
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `maternita-zaloha-${formatToISO(new Date())}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const requestImport = () => {
+        if (window.confirm("Obnovení zálohy přepíše současný postup. Pokračovat?")) {
+            fileInputRef.current?.click();
+        }
+    };
+
+    const handleImportFile = (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const raw = JSON.parse(reader.result);
+                const imported = raw?.completedDays ?? raw;
+                if (!imported || typeof imported !== 'object') {
+                    throw new Error('Invalid backup');
+                }
+                const cleaned = {};
+                Object.entries(imported).forEach(([key, value]) => {
+                    if (allDayIds.has(key) && value) {
+                        cleaned[key] = true;
+                    }
+                });
+                setCompletedDays(cleaned);
+            } catch (error) {
+                window.alert("Zálohu se nepodařilo načíst.");
+            } finally {
+                event.target.value = '';
+            }
+        };
+        reader.readAsText(file);
     };
 
     // Calendar logic
@@ -181,14 +237,16 @@ function App() {
                         {dayHeads.map(h => <div key={h} className="calendar-day-head">{h}</div>)}
                         {pads.map((_, i) => <div key={`pad-${i}`} className="calendar-cell empty" />)}
                         {monthDays.map(day => {
-                            const checked = !!completedDays[day.id];
+                            const checked = day.id !== CELEBRATION_DATE && !!completedDays[day.id];
                             const isToday = day.id === todayISO;
+                            const isCelebration = day.id === CELEBRATION_DATE;
                             return (
                                 <div
                                     key={day.id}
-                                    className={`calendar-cell ${checked ? 'checked' : ''} ${isToday ? 'today' : ''}`}
+                                    className={`calendar-cell ${checked ? 'checked' : ''} ${isToday ? 'today' : ''} ${isCelebration ? 'celebration' : ''}`}
                                 >
                                     <span className="calendar-date">{day.date.getDate()}</span>
+                                    {isCelebration && <span className="calendar-heart">❤️</span>}
                                 </div>
                             );
                         })}
@@ -207,19 +265,19 @@ function App() {
                     {todayData ? todayData.msg : (todayISO < START_DATE ? "Těšíme se na začátek odpočtu!" : "Odpočet dokončen! Užij si mateřskou!")}
                 </div>
 
-                {todayData ? (
+                {todayData && !isCelebrationDay ? (
                     <button
                         className={`btn-cta ${completedDays[todayISO] ? 'btn-done' : ''}`}
                         onClick={toggleToday}
                     >
                         {completedDays[todayISO] ? "Hotovo. Táďa to viděl. ❤️" : "Odškrtnout dnešek"}
                     </button>
-                ) : (
+                ) : !todayData ? (
                     <div className="out-of-range">
                         <h2>{todayISO < START_DATE ? "Ještě nezačínáme" : "Cesta u konce!"}</h2>
                         <p>{todayISO < START_DATE ? `Odpočet startuje 13. 1. 2026` : `Gratulujeme k odchodu na mateřskou!`}</p>
                     </div>
-                )}
+                ) : null}
             </section>
 
             {/* KPI GRID */}
@@ -305,6 +363,17 @@ function App() {
 
             {/* FOOTER */}
             <footer className="footer">
+                <div className="backup-actions">
+                    <button className="btn-backup" onClick={exportBackup}>Záloha</button>
+                    <button className="btn-backup btn-backup-secondary" onClick={requestImport}>Obnovit</button>
+                    <input
+                        ref={fileInputRef}
+                        className="visually-hidden"
+                        type="file"
+                        accept="application/json"
+                        onChange={handleImportFile}
+                    />
+                </div>
                 <button className="btn-reset" onClick={handleReset}>Resetovat veškerý postup</button>
                 <p style={{ color: '#ccc', fontSize: '0.65rem', marginTop: '16px', fontWeight: 600 }}>Pro naši nejmilejší maminku ✨</p>
             </footer>

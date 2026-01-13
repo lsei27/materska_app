@@ -330,6 +330,19 @@ body {
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
+.calendar-cell.celebration {
+  background: #fff8f9;
+}
+
+.calendar-heart {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
 /* List Section */
 .list-header {
   display: flex;
@@ -430,6 +443,40 @@ body {
   margin-top: auto;
   padding: 32px 0;
   text-align: center;
+}
+
+.backup-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.btn-backup {
+  background: #f7f7f7;
+  border: 1px solid #eee;
+  color: #555;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-backup-secondary {
+  background: #fff;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 .btn-reset {
