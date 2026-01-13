@@ -62,7 +62,7 @@ const FIXED_MESSAGES = {
     "2026-02-20": "Pátek. Týden uzavíráme bez dramatu.",
     "2026-02-21": "Sobota. Povolený režim „nic neřeším“.",
     "2026-02-22": "Neděle. Zítra se uvidí.",
-    "2026-02-23": "Pondělí. Už to chce jen klid.",
+    "2026-02-23": "Pondělí. Už it chce jen klid.",
     "2026-02-24": "Dnes nás čeká nové ovoce",
     "2026-02-25": "Středa. Budulínek má plán, ty klid.",
     "2026-02-26": "Čtvrtek. Dneska fakt zpomal.",
@@ -102,6 +102,7 @@ function App() {
             const id = formatToISO(current);
             days.push({
                 id,
+                date: new Date(current),
                 label: current.toLocaleDateString('cs-CZ', { weekday: 'short', day: 'numeric', month: 'numeric' }),
                 fullLabel: current.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' }),
                 msg: FIXED_MESSAGES[id] || "Dnes je krásný den!"
@@ -145,6 +146,49 @@ function App() {
             setCompletedDays({});
             localStorage.removeItem(STORAGE_KEY);
         }
+    };
+
+    // Calendar logic
+    const calendarMonths = useMemo(() => {
+        const months = {};
+        allDays.forEach(day => {
+            const key = day.date.toLocaleDateString('cs-CZ', { month: 'long', year: 'numeric' });
+            if (!months[key]) months[key] = [];
+            months[key].push(day);
+        });
+        return months;
+    }, [allDays]);
+
+    const renderCalendar = () => {
+        return Object.entries(calendarMonths).map(([monthName, monthDays]) => {
+            const firstDayOfWeek = (monthDays[0].date.getDay() + 6) % 7; // Monday = 0
+            const pads = Array.from({ length: firstDayOfWeek });
+            const dayHeads = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'];
+
+            return (
+                <div key={monthName} style={{ marginBottom: '20px' }}>
+                    <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#666', textTransform: 'capitalize' }}>
+                        {monthName}
+                    </h4>
+                    <div className="calendar-grid">
+                        {dayHeads.map(h => <div key={h} className="calendar-day-head">{h}</div>)}
+                        {pads.map((_, i) => <div key={`pad-${i}`} className="calendar-cell empty" />)}
+                        {monthDays.map(day => {
+                            const checked = !!completedDays[day.id];
+                            const isToday = day.id === todayISO;
+                            return (
+                                <div
+                                    key={day.id}
+                                    className={`calendar-cell active ${checked ? 'checked' : ''} ${isToday ? 'today' : ''}`}
+                                >
+                                    {day.date.getDate()}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+        });
     };
 
     return (
@@ -212,6 +256,12 @@ function App() {
                 </div>
             </section>
 
+            {/* CALENDAR SECTION */}
+            <section>
+                <h3 style={{ marginBottom: '16px' }}>Náhledový kalendář</h3>
+                {renderCalendar()}
+            </section>
+
             {/* DAYS LIST */}
             <section>
                 <div className="list-header">
@@ -235,7 +285,7 @@ function App() {
                                     </div>
                                     <div className="day-info">
                                         <div className="day-date">{day.label}</div>
-                                        <div className="day-msg">{day.msg}</div>
+                                        {/* <div className="day-msg">{day.msg}</div> */} {/* hidden as per user request */}
                                     </div>
                                     {isToday && <span className="status-badge today">DNES</span>}
                                     {checked && !isToday && <span className="status-badge">SPLNĚNO</span>}

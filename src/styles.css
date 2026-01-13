@@ -269,6 +269,8 @@ body {
 }
 
 .day-msg {
+  display: none;
+  /* Hidden as per user request */
   font-size: 0.85rem;
   color: var(--text-dim);
   margin-top: 2px;
