@@ -149,13 +149,6 @@ function App() {
 
     return (
         <div className="container">
-            <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                <img
-                    src="https://cdn.alza.cz/images/web-static/eshop-logos/alza_cz.svg"
-                    alt="Alza Logo"
-                    style={{ width: '120px', height: 'auto', opacity: 0.8 }}
-                />
-            </div>
             {/* HERO SECTION */}
             <section className="hero">
                 <div className="hero-date">{todayData ? todayData.fullLabel : "Dnes"}</div>
@@ -196,6 +189,17 @@ function App() {
 
             {/* PROGRESS BAR & TIMELINE */}
             <section className="progress-section">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                    <h3 style={{ margin: 0, fontSize: '1rem', color: '#2D3436' }}>Poslední dny v práci</h3>
+                    <div style={{ background: 'white', padding: '4px 8px', borderRadius: '8px', border: '1px solid #eee' }}>
+                        <img
+                            src="https://cdn.alza.cz/images/web-static/eshop-logos/alza_cz.svg"
+                            alt="Alza Logo"
+                            style={{ width: '70px', height: 'auto', display: 'block' }}
+                        />
+                    </div>
+                </div>
+
                 <div className="progress-bar-container">
                     <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }}></div>
                 </div>
@@ -211,7 +215,7 @@ function App() {
             {/* DAYS LIST */}
             <section>
                 <div className="list-header">
-                    <h3>Poslední dny v práci</h3>
+                    <h3>Přehled dní</h3>
                     <button className="list-toggle" onClick={() => setShowList(!showList)}>
                         {showList ? "Skrýt" : "Zobrazit dny"}
                     </button>
