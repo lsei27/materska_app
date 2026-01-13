@@ -164,12 +164,19 @@ function App() {
             const firstDayOfWeek = (monthDays[0].date.getDay() + 6) % 7; // Monday = 0
             const pads = Array.from({ length: firstDayOfWeek });
             const dayHeads = ['Po', 'Út', 'St', 'Čt', 'Pá', 'So', 'Ne'];
+            const monthIndex = monthDays[0].date.getMonth() + 1;
+            const year = monthDays[0].date.getFullYear();
+            const monthLabel = monthDays[0].date.toLocaleDateString('cs-CZ', { month: 'long' });
 
             return (
-                <div key={monthName} style={{ marginBottom: '20px' }}>
-                    <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#666', textTransform: 'capitalize' }}>
-                        {monthName}
-                    </h4>
+                <div key={monthName} className="calendar-month">
+                    <div className="calendar-month-header">
+                        <span className="calendar-month-code">{String(monthIndex).padStart(2, '0')}</span>
+                        <div className="calendar-month-title">
+                            <span>{monthLabel}</span>
+                        </div>
+                        <span className="calendar-month-year">{year}</span>
+                    </div>
                     <div className="calendar-grid">
                         {dayHeads.map(h => <div key={h} className="calendar-day-head">{h}</div>)}
                         {pads.map((_, i) => <div key={`pad-${i}`} className="calendar-cell empty" />)}
@@ -179,9 +186,9 @@ function App() {
                             return (
                                 <div
                                     key={day.id}
-                                    className={`calendar-cell active ${checked ? 'checked' : ''} ${isToday ? 'today' : ''}`}
+                                    className={`calendar-cell ${checked ? 'checked' : ''} ${isToday ? 'today' : ''}`}
                                 >
-                                    {day.date.getDate()}
+                                    <span className="calendar-date">{day.date.getDate()}</span>
                                 </div>
                             );
                         })}
@@ -257,8 +264,8 @@ function App() {
             </section>
 
             {/* CALENDAR SECTION */}
-            <section>
-                <h3 style={{ marginBottom: '16px' }}>Náhledový kalendář</h3>
+            <section className="calendar-section">
+                <h3 className="calendar-section-title">Náhledový kalendář</h3>
                 {renderCalendar()}
             </section>
 
