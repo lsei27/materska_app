@@ -149,6 +149,13 @@ function App() {
 
     return (
         <div className="container">
+            <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                <img
+                    src="https://cdn.alza.cz/images/web-static/eshop-logos/alza_cz.svg"
+                    alt="Alza Logo"
+                    style={{ width: '120px', height: 'auto', opacity: 0.8 }}
+                />
+            </div>
             {/* HERO SECTION */}
             <section className="hero">
                 <div className="hero-date">{todayData ? todayData.fullLabel : "Dnes"}</div>
