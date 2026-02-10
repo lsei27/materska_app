@@ -72,7 +72,7 @@ const FIXED_MESSAGES = {
     "2026-02-27": "Pátek. Únor splněn.",
     "2026-02-28": "Únor hotovo. Check.",
     "2026-03-01": "Březen. Už skoro cíl.",
-    "2026-03-02": "Pondělí. Poslední den v práci! 🎉",
+    "2026-03-02": "Pondělí. Už jen nadechnout.",
     "2026-03-03": CELEBRATION_MESSAGE,
 };
 
@@ -126,6 +126,9 @@ function App() {
     const isOfficeDay = (day) => {
         if (day.id === "2026-01-13" || day.id === CELEBRATION_DATE || day.id === "2026-02-11" || day.id === "2026-02-19") {
             return false;
+        }
+        if (day.id === "2026-03-02") {
+            return true;
         }
         const weekday = day.date.getDay();
         return weekday >= 2 && weekday <= 4;
