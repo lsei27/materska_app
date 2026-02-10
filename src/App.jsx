@@ -72,7 +72,7 @@ const FIXED_MESSAGES = {
     "2026-02-27": "Pátek. Únor splněn.",
     "2026-02-28": "Únor hotovo. Check.",
     "2026-03-01": "Březen. Už skoro cíl.",
-    "2026-03-02": "Pondělí. Už jen nadechnout.",
+    "2026-03-02": "Hurá, dnes poslední den! Teď už jen pohodička a těšení se na Táďu!",
     "2026-03-03": CELEBRATION_MESSAGE,
 };
 
