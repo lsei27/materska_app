@@ -2,9 +2,9 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 // KONSTRUKČNÍ POŽADAVKY: 2026-01-13 do 2026-03-10
 const START_DATE = "2026-01-13";
-const END_DATE = "2026-03-10";
-const CELEBRATION_DATE = "2026-03-10";
-const STORAGE_KEY = "maternity_countdown_v1";
+const END_DATE = "2026-03-03";
+const CELEBRATION_DATE = "2026-03-03";
+const STORAGE_KEY = "maternity_countdown_v2";
 const CELEBRATION_MESSAGE = "Hurá, už se jen těšíme na budulínka! 👶🏻❤️";
 const BACKUP_VERSION = 1;
 
@@ -53,7 +53,7 @@ const FIXED_MESSAGES = {
     "2026-02-08": "Neděle. Ideální den zpomalit.",
     "2026-02-09": "Pondělí. Bez tlaku, jede se dál.",
     "2026-02-10": "Dnes nás čeká nové ovoce",
-    "2026-02-11": "Středa. Budulínek maká, ty šetři síly.",
+    "2026-02-11": "Dnes máš volno, užívej si klid a pohodu.",
     "2026-02-12": "Čtvrtek. Klidně vypni hlavu.",
     "2026-02-13": "Pátek. Nic zásadního se dnes neřeší.",
     "2026-02-14": "Valentýn. V pohodě, bez velkých gest.",
@@ -61,7 +61,7 @@ const FIXED_MESSAGES = {
     "2026-02-16": "Pondělí. Stres dnes nemá vstup.",
     "2026-02-17": "Dnes nás čeká nové ovoce",
     "2026-02-18": "Středa. Tempo dolů, klid nahoru.",
-    "2026-02-19": "Čtvrtek. Neřeš, co není nutné.",
+    "2026-02-19": "Dnes máš volno, užívej si klid a pohodu.",
     "2026-02-20": "Pátek. Týden uzavíráme bez dramatu.",
     "2026-02-21": "Sobota. Povolený režim „nic neřeším“.",
     "2026-02-22": "Neděle. Zítra se uvidí.",
@@ -72,21 +72,28 @@ const FIXED_MESSAGES = {
     "2026-02-27": "Pátek. Únor splněn.",
     "2026-02-28": "Únor hotovo. Check.",
     "2026-03-01": "Březen. Už skoro cíl.",
-    "2026-03-02": "Pondělí. Teď už hlavně klid.",
-    "2026-03-03": "Dnes nás čeká nové ovoce",
-    "2026-03-04": "Středa. Nic netlač, všechno je v plánu.",
-    "2026-03-05": "Čtvrtek. Dneska žádný stres, fakt žádný.",
-    "2026-03-06": "Pátek. Jeden z posledních v tomhle módu.",
-    "2026-03-07": "Sobota. Pomalu ladíme hlavu.",
-    "2026-03-08": "Neděle. Klid před změnou.",
-    "2026-03-09": "Pondělí. Už jen nadechnout.",
-    "2026-03-10": CELEBRATION_MESSAGE,
+    "2026-03-02": "Pondělí. Poslední den v práci! 🎉",
+    "2026-03-03": CELEBRATION_MESSAGE,
 };
 
 function App() {
     const [completedDays, setCompletedDays] = useState(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
-        return saved ? JSON.parse(saved) : {};
+        if (saved) return JSON.parse(saved);
+
+        // V2 Auto-fill logic: Mark everything up to today as done
+        const initial = {};
+        const today = new Date();
+        const todayISO = formatToISO(today);
+        let current = parseLocalDate(START_DATE);
+
+        while (true) {
+            const id = formatToISO(current);
+            if (id > todayISO || id > END_DATE) break;
+            initial[id] = true;
+            current.setDate(current.getDate() + 1);
+        }
+        return initial;
     });
     const [showList, setShowList] = useState(false);
     const fileInputRef = useRef(null);
@@ -117,7 +124,7 @@ function App() {
     }, []);
     const allDayIds = useMemo(() => new Set(allDays.map(day => day.id)), [allDays]);
     const isOfficeDay = (day) => {
-        if (day.id === "2026-01-13" || day.id === CELEBRATION_DATE) {
+        if (day.id === "2026-01-13" || day.id === CELEBRATION_DATE || day.id === "2026-02-11" || day.id === "2026-02-19") {
             return false;
         }
         const weekday = day.date.getDay();
@@ -339,7 +346,7 @@ function App() {
                 </div>
                 <div className="timeline-labels">
                     <span>Start (13.1.)</span>
-                    <span>Mateřská (10.3.)</span>
+                    <span>Mateřská (3.3.)</span>
                 </div>
             </section>
 
