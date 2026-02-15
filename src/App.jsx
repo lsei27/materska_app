@@ -166,12 +166,12 @@ function App() {
     }).length;
 
     // Handlers
-    const toggleToday = () => {
-        if (!todayData) return;
-        if (isCelebrationDay) return;
+    const toggleDay = (dayId) => {
+        if (dayId > todayISO) return; // Prevent checking future days
+        if (dayId === CELEBRATION_DATE) return;
         setCompletedDays(prev => ({
             ...prev,
-            [todayISO]: !prev[todayISO]
+            [dayId]: !prev[dayId]
         }));
     };
 
@@ -271,6 +271,8 @@ function App() {
                                 <div
                                     key={day.id}
                                     className={`calendar-cell ${checked ? 'checked' : ''} ${isToday ? 'today' : ''} ${isCelebration ? 'celebration' : ''}`}
+                                    onClick={() => toggleDay(day.id)}
+                                    style={{ cursor: day.id <= todayISO ? 'pointer' : 'default' }}
                                 >
                                     <span className="calendar-date">{day.date.getDate()}</span>
                                     {isCelebration && <span className="calendar-heart">❤️</span>}
@@ -296,7 +298,7 @@ function App() {
                 {todayData && !isCelebrationDay ? (
                     <button
                         className={`btn-cta ${completedDays[todayISO] ? 'btn-done' : ''}`}
-                        onClick={toggleToday}
+                        onClick={() => toggleDay(todayISO)}
                     >
                         {completedDays[todayISO] ? "Hotovo. Táďa to viděl. ❤️" : "Odškrtnout dnešek"}
                     </button>
